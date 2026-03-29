@@ -4,6 +4,8 @@
  * This is a coarse detector for partial match reporting. It identifies regions
  * where FSK modulation energy is present, even if the signal isn't clean enough
  * for multimon-ng to decode a complete SAME header.
+ *
+ * Uses energy-ratio detection for robustness against varying signal levels.
  */
 
 const FREQ_MARK = 2083.3;
@@ -12,19 +14,19 @@ const FREQ_SPACE = 1562.5;
 // Minimum duration to count as FSK presence (a single SAME byte is ~15ms)
 const MIN_DURATION = 0.05;
 
-// Energy threshold — FSK signal should dominate the window
-const MAGNITUDE_THRESHOLD = 0.005;
+// Energy ratio threshold: mark or space frequency must contain at least this
+// fraction of the window's total energy
+const ENERGY_RATIO_THRESHOLD = 0.05;
 
 // 20ms windows with 50% overlap — short enough to catch brief FSK bursts
 const WINDOW_MS = 20;
 
 /**
- * Goertzel algorithm — magnitude squared at a single frequency.
+ * Generalized Goertzel algorithm — magnitude at an exact frequency.
  */
 function goertzel(samples, sampleRate, targetFreq) {
   const N = samples.length;
-  const k = Math.round((N * targetFreq) / sampleRate);
-  const w = (2 * Math.PI * k) / N;
+  const w = (2 * Math.PI * targetFreq) / sampleRate;
   const cosW = Math.cos(w);
   const coeff = 2 * cosW;
 
@@ -43,7 +45,7 @@ function goertzel(samples, sampleRate, targetFreq) {
 
 /**
  * Detect FSK energy intervals in audio.
- * Returns { detected: boolean, intervals: [{ start, end }] }
+ * Returns array of { start, end } intervals.
  */
 export function detectFsk(samples, sampleRate) {
   const windowSize = Math.round((WINDOW_MS / 1000) * sampleRate);
@@ -56,13 +58,32 @@ export function detectFsk(samples, sampleRate) {
   for (let offset = 0; offset + windowSize <= samples.length; offset += hopSize) {
     const window = samples.subarray(offset, offset + windowSize);
 
+    // Compute total energy
+    let sumSq = 0;
+    for (let i = 0; i < window.length; i++) {
+      sumSq += window[i] * window[i];
+    }
+    const energy = sumSq / window.length;
+
+    // Skip silent windows
+    if (energy < 0.000001) {
+      if (inFsk) {
+        const end = offset / sampleRate;
+        if (end - fskStart >= MIN_DURATION) {
+          intervals.push({ start: round3(fskStart), end: round3(end) });
+        }
+        inFsk = false;
+      }
+      continue;
+    }
+
     const magMark = goertzel(window, sampleRate, FREQ_MARK);
     const magSpace = goertzel(window, sampleRate, FREQ_SPACE);
 
-    // Either mark or space frequency should have significant energy
-    // (at any instant, the FSK signal is at one or the other)
+    // Either mark or space frequency should have significant energy ratio
     const fskPresent =
-      magMark > MAGNITUDE_THRESHOLD || magSpace > MAGNITUDE_THRESHOLD;
+      magMark / energy > ENERGY_RATIO_THRESHOLD ||
+      magSpace / energy > ENERGY_RATIO_THRESHOLD;
 
     if (fskPresent && !inFsk) {
       inFsk = true;
@@ -83,10 +104,7 @@ export function detectFsk(samples, sampleRate) {
     }
   }
 
-  return {
-    detected: intervals.length > 0,
-    intervals,
-  };
+  return intervals;
 }
 
 function round3(n) {

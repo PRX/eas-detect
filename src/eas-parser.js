@@ -95,8 +95,8 @@ function parseLocation(code) {
     return {
       code,
       subdivision: "0",
-      state_fips: "00",
-      county_fips: "000",
+      stateFips: "00",
+      countyFips: "000",
       state: "All States",
       county: "All Counties",
     };
@@ -105,8 +105,8 @@ function parseLocation(code) {
   const result = {
     code,
     subdivision,
-    state_fips: stateFips,
-    county_fips: countyFips,
+    stateFips,
+    countyFips,
     state: STATE_FIPS[stateFips] || `Unknown State (${stateFips})`,
     county: COUNTY_FIPS[fullFips] || `Unknown County (${fullFips})`,
   };
@@ -125,7 +125,7 @@ function parseLocation(code) {
   };
 
   if (subdivision !== "0") {
-    result.subdivision_description = SUBDIVISIONS[subdivision] || `Part ${subdivision}`;
+    result.subdivisionDescription = SUBDIVISIONS[subdivision] || `Part ${subdivision}`;
   }
 
   return result;
@@ -149,7 +149,7 @@ function parseDuration(tttt) {
     raw: tttt,
     hours,
     minutes,
-    total_minutes: totalMinutes,
+    totalMinutes,
     description: parts.join(" ") || "0 minutes",
   };
 }
@@ -169,7 +169,7 @@ function parseIssuedTime(jjjhhmm) {
 
   return {
     raw: jjjhhmm,
-    julian_day: julianDay,
+    julianDay,
     hour,
     minute,
     description: `Day ${julianDay}, ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} UTC`,
