@@ -11,6 +11,8 @@
  * the tone is mixed with speech or music.
  */
 
+import { goertzel } from "./goertzel.js";
+
 const FREQ_LOW = 853;
 const FREQ_HIGH = 960;
 
@@ -23,30 +25,6 @@ const ENERGY_RATIO_THRESHOLD = 0.05;
 
 // Analysis window: 100ms with 50% overlap (longer window = better frequency resolution)
 const WINDOW_MS = 100;
-
-/**
- * Generalized Goertzel algorithm — compute magnitude at an exact frequency.
- * Uses non-integer k for precise frequency targeting.
- */
-function goertzel(samples, sampleRate, targetFreq) {
-  const N = samples.length;
-  const w = (2 * Math.PI * targetFreq) / sampleRate;
-  const cosW = Math.cos(w);
-  const coeff = 2 * cosW;
-
-  let s0 = 0;
-  let s1 = 0;
-  let s2 = 0;
-
-  for (let i = 0; i < N; i++) {
-    s0 = samples[i] + coeff * s1 - s2;
-    s2 = s1;
-    s1 = s0;
-  }
-
-  // Magnitude squared, normalized by N
-  return (s1 * s1 + s2 * s2 - coeff * s1 * s2) / (N * N);
-}
 
 /**
  * Classify which tone(s) are present in a window using energy ratios.

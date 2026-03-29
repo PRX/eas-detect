@@ -8,6 +8,8 @@
  * Uses energy-ratio detection for robustness against varying signal levels.
  */
 
+import { goertzel } from "./goertzel.js";
+
 const FREQ_MARK = 2083.3;
 const FREQ_SPACE = 1562.5;
 
@@ -20,28 +22,6 @@ const ENERGY_RATIO_THRESHOLD = 0.05;
 
 // 20ms windows with 50% overlap — short enough to catch brief FSK bursts
 const WINDOW_MS = 20;
-
-/**
- * Generalized Goertzel algorithm — magnitude at an exact frequency.
- */
-function goertzel(samples, sampleRate, targetFreq) {
-  const N = samples.length;
-  const w = (2 * Math.PI * targetFreq) / sampleRate;
-  const cosW = Math.cos(w);
-  const coeff = 2 * cosW;
-
-  let s0 = 0;
-  let s1 = 0;
-  let s2 = 0;
-
-  for (let i = 0; i < N; i++) {
-    s0 = samples[i] + coeff * s1 - s2;
-    s2 = s1;
-    s1 = s0;
-  }
-
-  return (s1 * s1 + s2 * s2 - coeff * s1 * s2) / (N * N);
-}
 
 /**
  * Detect FSK energy intervals in audio.
