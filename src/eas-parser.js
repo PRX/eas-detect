@@ -111,8 +111,21 @@ function parseLocation(code) {
     county: COUNTY_FIPS[fullFips] || `Unknown County (${fullFips})`,
   };
 
+  const SUBDIVISIONS = {
+    "0": "Entire county",
+    "1": "Northwest",
+    "2": "North",
+    "3": "Northeast",
+    "4": "West",
+    "5": "Central",
+    "6": "East",
+    "7": "Southwest",
+    "8": "South",
+    "9": "Southeast",
+  };
+
   if (subdivision !== "0") {
-    result.subdivision_description = `Part ${subdivision} of county`;
+    result.subdivision_description = SUBDIVISIONS[subdivision] || `Part ${subdivision}`;
   }
 
   return result;
