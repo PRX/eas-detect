@@ -1,5 +1,5 @@
 {
-  "name": "@prx/eas-detect",
+  "name": "@prx.org/eas-detect",
   "version": "0.1.0",
   "description": "Detect EAS (Emergency Alert System) tones and SAME messages in audio files",
   "type": "module",
@@ -11,7 +11,7 @@
     "eas-detect": "./cli.js"
   },
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest",
     "generate-fixtures": "node test/generate-fixtures.js"
   },
   "keywords": [

@@ -1,4 +1,4 @@
-# @prx/eas-detect
+# @prx.org/eas-detect
 
 Detect [EAS (Emergency Alert System)](https://en.wikipedia.org/wiki/Emergency_Alert_System) tones and SAME messages in audio files. Returns structured JSON with decoded headers, FIPS location lookups, and timecodes for when each EAS component occurs in the audio.
 
@@ -15,7 +15,7 @@ Supports full and **partial** match detection — even if only the attention ton
 ## Install
 
 ```bash
-npm install @prx/eas-detect
+npm install @prx.org/eas-detect
 ```
 
 ## CLI Usage
@@ -37,7 +37,7 @@ Output is JSON to stdout.
 ## Library Usage
 
 ```js
-import { detect } from "@prx/eas-detect";
+import { detect } from "@prx.org/eas-detect";
 
 const result = await detect("recording.wav");
 
@@ -56,7 +56,7 @@ if (result.easDetected) {
 For processing audio from a Buffer (e.g., from S3):
 
 ```js
-import { detectBuffer } from "@prx/eas-detect";
+import { detectBuffer } from "@prx.org/eas-detect";
 
 const result = await detectBuffer(audioBuffer, ".wav");
 ```
