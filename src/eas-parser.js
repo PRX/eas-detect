@@ -5,15 +5,8 @@
  * Multiple location codes are separated by hyphens before the +TTTT field.
  */
 
-import { ORIGINATOR_CODES, EVENT_CODES, STATE_FIPS } from "./eas-codes.js";
-
-let COUNTY_FIPS = {};
-try {
-  const mod = await import("./fips-counties.js");
-  COUNTY_FIPS = mod.COUNTY_FIPS;
-} catch {
-  // County lookup will return code only if file is missing
-}
+import { EVENT_CODES, ORIGINATOR_CODES, STATE_FIPS } from "./eas-codes.js";
+import { COUNTY_FIPS } from "./fips-counties.js";
 
 /**
  * Parse a raw SAME header string.
