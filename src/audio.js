@@ -1,7 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, unlinkSync, mkdtempSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
+import { readFileSync } from "node:fs";
 
 const SAMPLE_RATE = 22050;
 
@@ -36,20 +34,6 @@ export function readAudio(filePath, { raw = false, sampleRate = SAMPLE_RATE } = 
   }
 
   return { samples, sampleRate };
-}
-
-/**
- * Read audio from a Buffer (e.g., from S3) by writing to a temp file first.
- */
-export function readAudioBuffer(buffer, extension = ".wav") {
-  const dir = mkdtempSync(join(tmpdir(), "eas-"));
-  const tmpFile = join(dir, `input${extension}`);
-  writeFileSync(tmpFile, buffer);
-  try {
-    return readAudio(tmpFile);
-  } finally {
-    unlinkSync(tmpFile);
-  }
 }
 
 export { SAMPLE_RATE };

@@ -4,11 +4,11 @@
  * Runs all detectors on an audio file and returns a unified result.
  */
 
-import { SAMPLE_RATE, readAudio, readAudioBuffer } from "./audio.js";
 import { detectAttentionTone } from "./attention-tone.js";
+import { readAudio, SAMPLE_RATE } from "./audio.js";
+import { parseSameHeader } from "./eas-parser.js";
 import { detectFsk } from "./fsk-detect.js";
 import { decodeSame } from "./same-decode.js";
-import { parseSameHeader } from "./eas-parser.js";
 
 // Intervals within this gap (seconds) are merged into one
 const MERGE_GAP = 0.1;
@@ -107,7 +107,6 @@ function mergeIntervals(sorted) {
  * Detect EAS content from a Buffer (for Lambda / programmatic use).
  */
 export async function detectBuffer(buffer, extension = ".wav") {
-  const { samples, sampleRate } = readAudioBuffer(buffer, extension);
   const { mkdtempSync, writeFileSync, unlinkSync } = await import("node:fs");
   const { join } = await import("node:path");
   const { tmpdir } = await import("node:os");
@@ -117,7 +116,7 @@ export async function detectBuffer(buffer, extension = ".wav") {
   writeFileSync(tmpFile, buffer);
 
   try {
-    return await detect(tmpFile);
+    return detect(tmpFile);
   } finally {
     try { unlinkSync(tmpFile); } catch {}
   }

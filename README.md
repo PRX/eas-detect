@@ -20,11 +20,13 @@ npm install @prx/eas-detect
 
 ## CLI Usage
 
+Call on any audio file, it will use sox to analyze the file:
+
 ```bash
 npx eas-detect recording.wav
 ```
 
-For raw PCM input (signed 16-bit little-endian):
+For raw PCM input (signed 16-bit little-endian) you also need to specify the sample rate:
 
 ```bash
 npx eas-detect recording.bin --raw --sample-rate 22050

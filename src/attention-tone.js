@@ -3,8 +3,8 @@
  *
  * Detects three cases:
  * - "attentionTone" — 853 Hz and 960 Hz played simultaneously (standard EAS)
- * - "tone960" — 960 Hz present alone
- * - "tone853" — 853 Hz present alone
+ * - "tone960" — 960 Hz present alone, which the FCC docs allows for mono
+ * - "tone853" — 853 Hz present alone, which is less of an issue, but still to be avoided
  *
  * Uses the Goertzel algorithm with energy-ratio detection: the tone frequency's
  * energy is compared to total window energy, making detection robust even when
