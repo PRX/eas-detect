@@ -1,0 +1,4 @@
+node_modules/
+test/fixtures/*.wav
+test/fixtures/*.bin
+.DS_Store
