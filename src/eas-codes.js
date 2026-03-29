@@ -1,81 +1,94 @@
 /**
  * EAS/SAME lookup tables for human-readable interpretation.
+ *
+ * Originator and event codes per 47 CFR 11.31 (FCC Part 11 rules).
+ * https://www.ecfr.gov/current/title-47/chapter-I/subchapter-A/part-11/subpart-B/section-11.31
+ *
+ * State FIPS codes per ANSI INCITS 38:2009.
  */
 
 export const ORIGINATOR_CODES = {
-  EAS: "Emergency Alert System Participant",
+  PEP: "United States Government",
   CIV: "Civil Authorities",
   WXR: "National Weather Service",
-  PEP: "Primary Entry Point System",
+  EAS: "EAS Participant",
 };
 
 export const EVENT_CODES = {
-  // National
+  // National codes (required)
   EAN: "Emergency Action Notification",
   NIC: "National Information Center",
   NPT: "National Periodic Test",
-  NMN: "National Message Notification",
   RMT: "Required Monthly Test",
   RWT: "Required Weekly Test",
 
-  // Weather — warnings
-  TOR: "Tornado Warning",
-  SVR: "Severe Thunderstorm Warning",
-  FFW: "Flash Flood Warning",
-  FLW: "Flood Warning",
-  SMW: "Special Marine Warning",
-  SVS: "Severe Weather Statement",
-  SPS: "Special Weather Statement",
-  BZW: "Blizzard Warning",
-  WSW: "Winter Storm Warning",
-  EWW: "Extreme Wind Warning",
-  HUW: "Hurricane Warning",
-  HUA: "Hurricane Watch",
-  HLS: "Hurricane Statement",
-  TSW: "Tsunami Warning",
-  TSA: "Tsunami Watch",
-  DSW: "Dust Storm Warning",
-  SQW: "Snow Squall Warning",
-
-  // Weather — watches
-  TOA: "Tornado Watch",
-  SVA: "Severe Thunderstorm Watch",
-  FFA: "Flash Flood Watch",
-  FLA: "Flood Watch",
-  WSA: "Winter Storm Watch",
-
-  // Weather — advisories
-  WCW: "Wind Chill Warning",
-  HWW: "High Wind Warning",
-  HWA: "High Wind Watch",
-  FRW: "Fire Warning",
-  CFW: "Coastal Flood Warning",
-  CFA: "Coastal Flood Watch",
-
-  // Civil
-  CEM: "Civil Emergency Message",
+  // State and local — civil/emergency
   ADR: "Administrative Message",
-  CAE: "Child Abduction Emergency",
-  LAE: "Local Area Emergency",
-  CDW: "Civil Danger Warning",
-  EVI: "Evacuation Immediate",
-  SPW: "Shelter in Place Warning",
-  LEW: "Law Enforcement Warning",
   BLU: "Blue Alert",
+  CAE: "Child Abduction Emergency",
+  CDW: "Civil Danger Warning",
+  CEM: "Civil Emergency Message",
+  EQW: "Earthquake Warning",
+  EVI: "Evacuation Immediate",
+  FRW: "Fire Warning",
+  HMW: "Hazardous Materials Warning",
+  LAE: "Local Area Emergency",
+  LEW: "Law Enforcement Warning",
+  MEP: "Missing and Endangered Persons",
+  NMN: "Network Message Notification",
   NUW: "Nuclear Power Plant Warning",
   RHW: "Radiological Hazard Warning",
+  SPW: "Shelter in Place Warning",
+  TOE: "911 Telephone Outage Emergency",
   VOW: "Volcano Warning",
+
+  // State and local — weather warnings
   AVW: "Avalanche Warning",
+  BZW: "Blizzard Warning",
+  CFW: "Coastal Flood Warning",
+  DSW: "Dust Storm Warning",
+  EWW: "Extreme Wind Warning",
+  FFW: "Flash Flood Warning",
+  FLW: "Flood Warning",
+  HUW: "Hurricane Warning",
+  HWW: "High Wind Warning",
+  SMW: "Special Marine Warning",
+  SQW: "Snow Squall Warning",
+  SSW: "Storm Surge Warning",
+  SVR: "Severe Thunderstorm Warning",
+  TOR: "Tornado Warning",
+  TRW: "Tropical Storm Warning",
+  TSW: "Tsunami Warning",
+  WSW: "Winter Storm Warning",
+
+  // State and local — weather watches
   AVA: "Avalanche Watch",
-  EQW: "Earthquake Warning",
-  FRW: "Fire Warning",
+  CFA: "Coastal Flood Watch",
+  FFA: "Flash Flood Watch",
+  FLA: "Flood Watch",
+  HUA: "Hurricane Watch",
+  HWA: "High Wind Watch",
+  SSA: "Storm Surge Watch",
+  SVA: "Severe Thunderstorm Watch",
+  TOA: "Tornado Watch",
+  TRA: "Tropical Storm Watch",
+  TSA: "Tsunami Watch",
+  WSA: "Winter Storm Watch",
 
-  // Practice/test
+  // State and local — weather statements
+  FFS: "Flash Flood Statement",
+  FLS: "Flood Statement",
+  HLS: "Hurricane Statement",
+  SPS: "Special Weather Statement",
+  SVS: "Severe Weather Statement",
+
+  // Test/demo
   DMO: "Practice/Demo Warning",
-  PEV: "Potential Evacuation",
 
-  // AMBER
+  // Additional codes in use by states and NWS but not listed in 47 CFR 11.31
   AMB: "AMBER Alert",
+  PEV: "Potential Evacuation",
+  WCW: "Wind Chill Warning",
 };
 
 export const STATE_FIPS = {
