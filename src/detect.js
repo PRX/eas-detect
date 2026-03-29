@@ -4,7 +4,7 @@
  * Runs all detectors on an audio file and returns a unified result.
  */
 
-import { detectAttentionTone } from "./attention-tone.js";
+import { detectAttentionTone } from "./attention-tone-detect.js";
 import { unlinkSync } from "node:fs";
 import { readAudio, SAMPLE_RATE } from "./audio.js";
 import { parseSameHeader } from "./eas-parser.js";

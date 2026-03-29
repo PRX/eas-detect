@@ -9,16 +9,13 @@
  */
 
 import { goertzel } from "./goertzel.js";
+import { ENERGY_RATIO_THRESHOLD, SILENCE_THRESHOLD, windowEnergy, round3 } from "./dsp-util.js";
 
 const FREQ_MARK = 2083.3;
 const FREQ_SPACE = 1562.5;
 
 // Minimum duration to count as FSK presence (a single SAME byte is ~15ms)
 const MIN_DURATION = 0.05;
-
-// Energy ratio threshold: mark or space frequency must contain at least this
-// fraction of the window's total energy
-const ENERGY_RATIO_THRESHOLD = 0.05;
 
 // 20ms windows with 50% overlap — short enough to catch brief FSK bursts
 const WINDOW_MS = 20;
@@ -37,16 +34,9 @@ export function detectFsk(samples, sampleRate) {
 
   for (let offset = 0; offset + windowSize <= samples.length; offset += hopSize) {
     const window = samples.subarray(offset, offset + windowSize);
+    const energy = windowEnergy(window);
 
-    // Compute total energy
-    let sumSq = 0;
-    for (let i = 0; i < window.length; i++) {
-      sumSq += window[i] * window[i];
-    }
-    const energy = sumSq / window.length;
-
-    // Skip silent windows
-    if (energy < 0.000001) {
+    if (energy < SILENCE_THRESHOLD) {
       if (inFsk) {
         const end = offset / sampleRate;
         if (end - fskStart >= MIN_DURATION) {
@@ -60,7 +50,6 @@ export function detectFsk(samples, sampleRate) {
     const magMark = goertzel(window, sampleRate, FREQ_MARK);
     const magSpace = goertzel(window, sampleRate, FREQ_SPACE);
 
-    // Either mark or space frequency should have significant energy ratio
     const fskPresent =
       magMark / energy > ENERGY_RATIO_THRESHOLD ||
       magSpace / energy > ENERGY_RATIO_THRESHOLD;
@@ -85,8 +74,4 @@ export function detectFsk(samples, sampleRate) {
   }
 
   return intervals;
-}
-
-function round3(n) {
-  return Math.round(n * 1000) / 1000;
 }

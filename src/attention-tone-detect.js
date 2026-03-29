@@ -12,16 +12,13 @@
  */
 
 import { goertzel } from "./goertzel.js";
+import { ENERGY_RATIO_THRESHOLD, SILENCE_THRESHOLD, windowEnergy, round3 } from "./dsp-util.js";
 
 const FREQ_LOW = 853;
 const FREQ_HIGH = 960;
 
 // Minimum duration in seconds to count as a tone
 const MIN_DURATION = 0.5;
-
-// Energy ratio threshold: tone frequency must contain at least this fraction
-// of the window's total energy. 0.05 = 5% of energy at the target frequency.
-const ENERGY_RATIO_THRESHOLD = 0.05;
 
 // Analysis window: 100ms with 50% overlap (longer window = better frequency resolution)
 const WINDOW_MS = 100;
@@ -31,25 +28,14 @@ const WINDOW_MS = 100;
  * Returns "attentionTone", "tone960", "tone853", or null.
  */
 function classifyWindow(samples, sampleRate) {
-  // Compute total energy (RMS squared)
-  let sumSq = 0;
-  for (let i = 0; i < samples.length; i++) {
-    sumSq += samples[i] * samples[i];
-  }
-  const energy = sumSq / samples.length;
-
-  // Skip silent windows
-  if (energy < 0.000001) return null;
+  const energy = windowEnergy(samples);
+  if (energy < SILENCE_THRESHOLD) return null;
 
   const mag853 = goertzel(samples, sampleRate, FREQ_LOW);
   const mag960 = goertzel(samples, sampleRate, FREQ_HIGH);
 
-  // Energy ratio: what fraction of window energy is at each frequency
-  const ratio853 = mag853 / energy;
-  const ratio960 = mag960 / energy;
-
-  const has853 = ratio853 > ENERGY_RATIO_THRESHOLD;
-  const has960 = ratio960 > ENERGY_RATIO_THRESHOLD;
+  const has853 = mag853 / energy > ENERGY_RATIO_THRESHOLD;
+  const has960 = mag960 / energy > ENERGY_RATIO_THRESHOLD;
 
   if (has853 && has960) return "attentionTone";
   if (has960) return "tone960";
@@ -76,7 +62,6 @@ export function detectAttentionTone(samples, sampleRate) {
     const type = classifyWindow(window, sampleRate);
 
     if (type !== currentType) {
-      // Close previous interval
       if (currentType !== null) {
         const end = offset / sampleRate;
         if (end - toneStart >= MIN_DURATION) {
@@ -87,13 +72,11 @@ export function detectAttentionTone(samples, sampleRate) {
           });
         }
       }
-      // Start new interval
       currentType = type;
       toneStart = offset / sampleRate;
     }
   }
 
-  // Close any open interval
   if (currentType !== null) {
     const end = samples.length / sampleRate;
     if (end - toneStart >= MIN_DURATION) {
@@ -106,8 +89,4 @@ export function detectAttentionTone(samples, sampleRate) {
   }
 
   return intervals;
-}
-
-function round3(n) {
-  return Math.round(n * 1000) / 1000;
 }
