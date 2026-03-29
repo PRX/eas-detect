@@ -39,10 +39,10 @@ import { detect } from "@prx/eas-detect";
 
 const result = await detect("recording.wav");
 
-if (result.eas_detected) {
-  console.log(`Match: ${result.match_type}`); // "full", "partial", or "none"
+if (result.easDetected) {
+  console.log(`Match: ${result.matchType}`); // "full", "partial", or "none"
 
-  for (const header of result.same_headers) {
+  for (const header of result.sameHeaders) {
     console.log(`${header.event.name} from ${header.originator.name}`);
     for (const loc of header.locations) {
       console.log(`  ${loc.county}, ${loc.state}`);
@@ -68,19 +68,19 @@ A complete EAS message with header, attention tone, and End of Message:
 ```json
 {
   "file": "recording.wav",
-  "duration_seconds": 18.886,
-  "eas_detected": true,
-  "match_type": "full",
+  "durationSeconds": 18.886,
+  "easDetected": true,
+  "matchType": "full",
   "timecodes": [
     { "type": "fsk", "start": 0.491, "end": 1.483 },
     { "type": "fsk", "start": 2.486, "end": 3.478 },
     { "type": "fsk", "start": 4.48, "end": 5.462 },
-    { "type": "attention_tone", "start": 6.459, "end": 14.445 },
+    { "type": "attentionTone", "start": 6.459, "end": 14.445 },
     { "type": "fsk", "start": 15.465, "end": 15.766 },
     { "type": "fsk", "start": 16.768, "end": 17.079 },
     { "type": "fsk", "start": 18.071, "end": 18.382 }
   ],
-  "attention_tone": {
+  "attentionTone": {
     "detected": true,
     "intervals": [{ "start": 6.459, "end": 14.445 }]
   },
@@ -95,7 +95,7 @@ A complete EAS message with header, attention tone, and End of Message:
       { "start": 18.071, "end": 18.382 }
     ]
   },
-  "same_headers": [
+  "sameHeaders": [
     {
       "raw": "ZCZC-WXR-TOR-039173-039051+0030-1591829-KLST/NWS-",
       "originator": { "code": "WXR", "name": "National Weather Service" },
@@ -104,16 +104,16 @@ A complete EAS message with header, attention tone, and End of Message:
         {
           "code": "039173",
           "subdivision": "0",
-          "state_fips": "39",
-          "county_fips": "173",
+          "stateFips": "39",
+          "countyFips": "173",
           "state": "Ohio",
           "county": "Wood County"
         },
         {
           "code": "039051",
           "subdivision": "0",
-          "state_fips": "39",
-          "county_fips": "051",
+          "stateFips": "39",
+          "countyFips": "051",
           "state": "Ohio",
           "county": "Fulton County"
         }
@@ -122,12 +122,12 @@ A complete EAS message with header, attention tone, and End of Message:
         "raw": "0030",
         "hours": 0,
         "minutes": 30,
-        "total_minutes": 30,
+        "totalMinutes": 30,
         "description": "30 minutes"
       },
       "issued": {
         "raw": "1591829",
-        "julian_day": 159,
+        "julianDay": 159,
         "hour": 18,
         "minute": 29,
         "description": "Day 159, 18:29 UTC"
@@ -136,7 +136,7 @@ A complete EAS message with header, attention tone, and End of Message:
       "timecode": { "start": 0.491, "end": 5.462 }
     }
   ],
-  "end_of_message": true
+  "endOfMessage": true
 }
 ```
 
@@ -147,15 +147,15 @@ When only some EAS components are present — for example, just the End of Messa
 ```json
 {
   "file": "recording.wav",
-  "duration_seconds": 3.914,
-  "eas_detected": true,
-  "match_type": "partial",
+  "durationSeconds": 3.914,
+  "easDetected": true,
+  "matchType": "partial",
   "timecodes": [
     { "type": "fsk", "start": 0.491, "end": 0.802 },
     { "type": "fsk", "start": 1.804, "end": 2.105 },
     { "type": "fsk", "start": 3.107, "end": 3.408 }
   ],
-  "attention_tone": { "detected": false, "intervals": [] },
+  "attentionTone": { "detected": false, "intervals": [] },
   "fsk": {
     "detected": true,
     "intervals": [
@@ -164,14 +164,14 @@ When only some EAS components are present — for example, just the End of Messa
       { "start": 3.107, "end": 3.408 }
     ]
   },
-  "same_headers": [],
-  "end_of_message": true
+  "sameHeaders": [],
+  "endOfMessage": true
 }
 ```
 
 ## Match Types
 
-| match_type | Meaning |
+| matchType | Meaning |
 |-----------|---------|
 | `full` | SAME header + attention tone + End of Message all present |
 | `partial` | At least one EAS component detected (header, attention tone, EOM, or FSK energy) |

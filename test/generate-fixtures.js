@@ -231,6 +231,18 @@ writeWav(
   ]),
 );
 
+// 8. 960 Hz tone only (no 853 Hz)
+writeWav(
+  join(FIXTURES_DIR, "tone-960-only.wav"),
+  concat([silence(0.5), sineWave(960, 5, 0.5), silence(0.5)]),
+);
+
+// 9. 853 Hz tone only (no 960 Hz)
+writeWav(
+  join(FIXTURES_DIR, "tone-853-only.wav"),
+  concat([silence(0.5), sineWave(853, 5, 0.5), silence(0.5)]),
+);
+
 // --- Download sameold samples ---
 
 console.log("\nDownloading sameold sample files...");
