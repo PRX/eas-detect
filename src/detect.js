@@ -5,6 +5,7 @@
  */
 
 import { detectAttentionTone } from "./attention-tone.js";
+import { unlinkSync } from "node:fs";
 import { readAudio, SAMPLE_RATE } from "./audio.js";
 import { parseSameHeader } from "./eas-parser.js";
 import { detectFsk } from "./fsk-detect.js";
@@ -23,14 +24,19 @@ const MERGE_GAP = 0.1;
  * @returns {object} Detection results as JSON-serializable object
  */
 export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE } = {}) {
-  // Read audio into PCM samples for tone/FSK analysis
-  const { samples, sampleRate: sr } = readAudio(filePath, { raw, sampleRate });
+  // Read audio into PCM samples and a raw file for multimon-ng
+  const { samples, sampleRate: sr, rawPath } = readAudio(filePath, { raw, sampleRate });
   const durationSeconds = Math.round((samples.length / sr) * 1000) / 1000;
 
-  // Run detectors
+  // Run detectors — reuse the same raw PCM file for all of them
   const toneIntervals = detectAttentionTone(samples, sr);
   const fskIntervals = detectFsk(samples, sr);
-  const same = decodeSame(filePath, { raw, sampleRate });
+  const same = decodeSame(rawPath);
+
+  // Clean up temp raw file (only if readAudio created one)
+  if (rawPath !== filePath) {
+    try { unlinkSync(rawPath); } catch {}
+  }
 
   // Parse any decoded SAME headers
   const sameHeaders = same.headers.map(parseSameHeader);

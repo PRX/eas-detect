@@ -1,29 +1,21 @@
 /**
- * Decode SAME headers from audio using multimon-ng.
+ * Decode SAME headers from raw PCM audio using multimon-ng.
  *
- * Pipes audio through sox → multimon-ng and parses the text output
- * for SAME header strings and EOM markers.
+ * Expects a raw s16le 22050 Hz mono PCM file (as produced by readAudio).
  */
 
-import { execFileSync, execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 /**
- * Run multimon-ng on an audio file and extract SAME messages.
- * Returns { headers: string[], endOfMessage: boolean }
+ * Run multimon-ng on a raw PCM file and extract SAME messages.
+ * @param {string} rawPath - Path to s16le 22050 Hz mono raw PCM file
+ * @returns {{ headers: string[], endOfMessage: boolean }}
  */
-export function decodeSame(filePath, { raw = false, sampleRate = 22050 } = {}) {
-  const soxArgs = raw
-    ? ["-t", "raw", "-e", "signed-integer", "-b", "16", "-r", String(sampleRate), "-c", "1", filePath]
-    : [filePath];
-
-  // sox input → s16le 22050 mono raw → multimon-ng EAS decoder
-  const command = buildCommand(soxArgs);
+export function decodeSame(rawPath) {
   let output;
 
   try {
-    output = execSync(command, {
-      maxBuffer: 10 * 1024 * 1024,
+    output = execFileSync("multimon-ng", ["-t", "raw", "-a", "EAS", rawPath], {
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -33,24 +25,6 @@ export function decodeSame(filePath, { raw = false, sampleRate = 22050 } = {}) {
   }
 
   return parseSameOutput(output);
-}
-
-/**
- * Build the sox | multimon-ng pipeline command.
- */
-function buildCommand(soxArgs) {
-  const sox = [
-    "sox",
-    ...soxArgs,
-    "-t", "raw",
-    "-e", "signed-integer",
-    "-b", "16",
-    "-r", "22050",
-    "-c", "1",
-    "-",
-  ].map(shellEscape).join(" ");
-
-  return `${sox} | multimon-ng -t raw -a EAS -`;
 }
 
 /**
@@ -81,9 +55,4 @@ function parseSameOutput(output) {
   }
 
   return { headers, endOfMessage };
-}
-
-function shellEscape(arg) {
-  if (/^[a-zA-Z0-9_./:=+-]+$/.test(arg)) return arg;
-  return `'${arg.replace(/'/g, "'\\''")}'`;
 }
