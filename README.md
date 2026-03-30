@@ -74,29 +74,14 @@ A complete EAS message with header, attention tone, and End of Message:
   "easDetected": true,
   "matchType": "full",
   "timecodes": [
-    { "type": "fsk", "start": 0.491, "end": 1.483 },
-    { "type": "fsk", "start": 2.486, "end": 3.478 },
-    { "type": "fsk", "start": 4.48, "end": 5.462 },
-    { "type": "attentionTone", "start": 6.459, "end": 14.445 },
-    { "type": "fsk", "start": 15.465, "end": 15.766 },
-    { "type": "fsk", "start": 16.768, "end": 17.079 },
+    { "type": "fsk", "start": 0.491, "end": 1.493 },
+    { "type": "fsk", "start": 2.476, "end": 3.488 },
+    { "type": "fsk", "start": 4.47, "end": 5.472 },
+    { "type": "attentionTone", "start": 6.403, "end": 14.457 },
+    { "type": "fsk", "start": 15.455, "end": 15.776 },
+    { "type": "fsk", "start": 16.768, "end": 17.089 },
     { "type": "fsk", "start": 18.071, "end": 18.382 }
   ],
-  "attentionTone": {
-    "detected": true,
-    "intervals": [{ "start": 6.459, "end": 14.445 }]
-  },
-  "fsk": {
-    "detected": true,
-    "intervals": [
-      { "start": 0.491, "end": 1.483 },
-      { "start": 2.486, "end": 3.478 },
-      { "start": 4.48, "end": 5.462 },
-      { "start": 15.465, "end": 15.766 },
-      { "start": 16.768, "end": 17.079 },
-      { "start": 18.071, "end": 18.382 }
-    ]
-  },
   "sameHeaders": [
     {
       "raw": "ZCZC-WXR-TOR-039173-039051+0030-1591829-KLST/NWS-",
@@ -135,7 +120,7 @@ A complete EAS message with header, attention tone, and End of Message:
         "description": "Day 159, 18:29 UTC"
       },
       "sender": "KLST/NWS",
-      "timecode": { "start": 0.491, "end": 5.462 }
+      "timecode": { "start": 0.491, "end": 5.472 }
     }
   ],
   "endOfMessage": true
@@ -154,18 +139,9 @@ When only some EAS components are present — for example, just the End of Messa
   "matchType": "partial",
   "timecodes": [
     { "type": "fsk", "start": 0.491, "end": 0.802 },
-    { "type": "fsk", "start": 1.804, "end": 2.105 },
-    { "type": "fsk", "start": 3.107, "end": 3.408 }
+    { "type": "fsk", "start": 1.794, "end": 2.105 },
+    { "type": "fsk", "start": 3.097, "end": 3.418 }
   ],
-  "attentionTone": { "detected": false, "intervals": [] },
-  "fsk": {
-    "detected": true,
-    "intervals": [
-      { "start": 0.491, "end": 0.802 },
-      { "start": 1.804, "end": 2.105 },
-      { "start": 3.107, "end": 3.408 }
-    ]
-  },
   "sameHeaders": [],
   "endOfMessage": true
 }
