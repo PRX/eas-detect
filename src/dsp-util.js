@@ -6,8 +6,10 @@
 // of the window's total energy. 0.05 = 5%.
 export const ENERGY_RATIO_THRESHOLD = 0.05;
 
-// Windows with energy below this are considered silent and skipped
-export const SILENCE_THRESHOLD = 0.000001;
+// Windows with mean energy below this are considered silent and skipped.
+// 0.001 is roughly -30 dBFS RMS — filters out near-silence where tiny
+// noise spikes can create misleading energy ratios.
+export const SILENCE_THRESHOLD = 0.001;
 
 /**
  * Compute mean energy (mean squared amplitude) of a sample window.

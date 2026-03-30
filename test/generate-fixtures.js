@@ -13,10 +13,10 @@
  * Also downloads sameold sample files if not present.
  */
 
-import { writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join  } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = join(__dirname, "fixtures");
@@ -120,15 +120,15 @@ function fskBytes(bytes) {
   return samples;
 }
 
-/** Encode a single byte as FSK */
-function fskByte(byte) {
-  return fskBytes([byte]);
-}
+// /** Encode a single byte as FSK */
+// function fskByte(byte) {
+//   return fskBytes([byte]);
+// }
 
-/** Encode the 16-byte 0xAB preamble */
-function fskPreamble() {
-  return fskBytes(new Array(16).fill(0xab));
-}
+// /** Encode the 16-byte 0xAB preamble */
+// function fskPreamble() {
+//   return fskBytes(new Array(16).fill(0xab));
+// }
 
 /** Encode a string as FSK bytes (preamble + ASCII chars) with continuous phase */
 function fskString(str) {
@@ -198,10 +198,10 @@ writeWav(
   concat([silence(0.5), attentionTone(10), silence(0.5)]),
 );
 
-// 3. FSK chirp only (just preamble + partial header, not enough for full decode)
+// 3. FSK chirp only (preamble + ZCZC start, not enough for full SAME decode)
 writeWav(
   join(FIXTURES_DIR, "fsk-chirp-only.wav"),
-  concat([silence(0.5), fskPreamble(), fskByte(0x5a), fskByte(0x43), silence(0.5)]),
+  concat([silence(0.5), fskString("ZCZC-WXR"), silence(0.5)]),
 );
 
 // 4. EOM only (NNNN)
