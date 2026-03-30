@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, mkdtempSync } from "node:fs";
+import { readFileSync, unlinkSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -49,6 +49,42 @@ export function readAudio(filePath, { raw = false, sampleRate = SAMPLE_RATE } = 
   }
 
   return { samples, sampleRate, rawPath };
+}
+
+/**
+ * Apply a sox bandpass filter to a raw PCM file and return filtered samples.
+ * Used to isolate EAS frequency bands before energy-ratio analysis, improving
+ * detection of tones buried under speech or music.
+ *
+ * @param {string} rawPath - Path to s16le 22050 Hz mono raw PCM file
+ * @param {number} lowFreq - Lower edge of the bandpass filter in Hz
+ * @param {number} highFreq - Upper edge of the bandpass filter in Hz
+ * @param {number} [sampleRate=SAMPLE_RATE] - Sample rate of the raw file
+ * @returns {Float64Array} Filtered samples normalized to [-1, 1]
+ */
+export function bandpassFilter(rawPath, lowFreq, highFreq, sampleRate = SAMPLE_RATE) {
+  const dir = mkdtempSync(join(tmpdir(), "eas-bp-"));
+  const filteredPath = join(dir, "filtered.raw");
+
+  try {
+    execFileSync("sox", [
+      "-t", "raw", "-e", "signed-integer", "-b", "16", "-r", String(sampleRate), "-c", "1",
+      rawPath,
+      "-t", "raw", "-e", "signed-integer", "-b", "16", "-r", String(sampleRate), "-c", "1",
+      filteredPath,
+      "sinc", `${lowFreq}-${highFreq}`,
+    ]);
+
+    const buf = readFileSync(filteredPath);
+    const sampleCount = buf.length / 2;
+    const samples = new Float64Array(sampleCount);
+    for (let i = 0; i < sampleCount; i++) {
+      samples[i] = buf.readInt16LE(i * 2) / 32768;
+    }
+    return samples;
+  } finally {
+    try { unlinkSync(filteredPath); } catch {}
+  }
 }
 
 export { SAMPLE_RATE };

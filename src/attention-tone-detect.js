@@ -11,8 +11,13 @@
  * the tone is mixed with speech or music.
  */
 
+import { ENERGY_RATIO_THRESHOLD, round3, windowEnergy } from "./dsp-util.js";
 import { goertzel } from "./goertzel.js";
-import { ENERGY_RATIO_THRESHOLD, SILENCE_THRESHOLD, windowEnergy, round3 } from "./dsp-util.js";
+
+// Silence threshold for attention tone detection. When the input is
+// bandpass-filtered (800-1000 Hz), remaining energy is already in the
+// target band, so we use a very low threshold to catch quiet recordings.
+const ATTN_SILENCE_THRESHOLD = 0.000001;
 
 const FREQ_LOW = 853;
 const FREQ_HIGH = 960;
@@ -29,7 +34,7 @@ const WINDOW_MS = 100;
  */
 function classifyWindow(samples, sampleRate) {
   const energy = windowEnergy(samples);
-  if (energy < SILENCE_THRESHOLD) return null;
+  if (energy < ATTN_SILENCE_THRESHOLD) return null;
 
   const mag853 = goertzel(samples, sampleRate, FREQ_LOW);
   const mag960 = goertzel(samples, sampleRate, FREQ_HIGH);

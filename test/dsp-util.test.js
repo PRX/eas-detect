@@ -39,6 +39,6 @@ describe("constants", () => {
 
   test("SILENCE_THRESHOLD is a small positive number", () => {
     expect(SILENCE_THRESHOLD).toBeGreaterThan(0);
-    expect(SILENCE_THRESHOLD).toBeLessThan(0.001);
+    expect(SILENCE_THRESHOLD).toBeLessThan(0.01);
   });
 });

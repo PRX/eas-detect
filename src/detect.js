@@ -5,11 +5,11 @@
  */
 
 import { detectAttentionTone } from "./attention-tone-detect.js";
-import { unlinkSync } from "node:fs";
-import { readAudio, SAMPLE_RATE } from "./audio.js";
+import { bandpassFilter, readAudio, SAMPLE_RATE } from "./audio.js";
 import { parseSameHeader } from "./eas-parser.js";
 import { detectFsk } from "./fsk-detect.js";
 import { decodeSame } from "./same-decode.js";
+import { unlinkSync } from "node:fs";
 
 // Intervals within this gap (seconds) are merged into one
 const MERGE_GAP = 0.1;
@@ -28,9 +28,16 @@ export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE }
   const { samples, sampleRate: sr, rawPath } = readAudio(filePath, { raw, sampleRate });
   const durationSeconds = Math.round((samples.length / sr) * 1000) / 1000;
 
-  // Run detectors — reuse the same raw PCM file for all of them
+  // Run tone and FSK detectors on unfiltered audio first.
+  // Also run attention tone on bandpass-filtered audio (800-1000 Hz) to catch
+  // tones buried under speech or music. FSK detection is not bandpass-filtered
+  // because dialogue harmonics in the 1500-2150 Hz range cause false positives.
   const toneIntervals = detectAttentionTone(samples, sr);
   const fskIntervals = detectFsk(samples, sr);
+
+  // Bandpass-filtered attention tone detection for weak/mixed signals
+  const filteredAttnSamples = bandpassFilter(rawPath, 800, 1000, sr);
+  const filteredToneIntervals = detectAttentionTone(filteredAttnSamples, sr);
   const same = decodeSame(rawPath);
 
   // Clean up temp raw file (only if readAudio created one)
@@ -41,10 +48,17 @@ export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE }
   // Parse any decoded SAME headers
   const sameHeaders = same.headers.map(parseSameHeader);
 
+  // Combine unfiltered and filtered attention tone results.
+  // Only use dual-tone (attentionTone) from the filtered path — single-tone
+  // detections (tone853/tone960) on filtered audio produce too many false
+  // positives from musical content in the 800-1000 Hz band.
+  const filteredDualTone = filteredToneIntervals.filter((i) => i.type === "attentionTone");
+  const combinedToneIntervals = [...toneIntervals, ...filteredDualTone];
+
   // Build unified timecodes — merge nearby intervals of the same type
   const allIntervals = [
     ...fskIntervals.map((i) => ({ type: "fsk", start: i.start, end: i.end })),
-    ...toneIntervals,
+    ...combinedToneIntervals,
   ];
   allIntervals.sort((a, b) => a.start - b.start);
   const timecodes = mergeIntervals(allIntervals);
