@@ -8,7 +8,7 @@
     ".": "./src/detect.js"
   },
   "bin": {
-    "eas-detect": "./cli.js"
+    "eas-detect": "cli.js"
   },
   "scripts": {
     "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest",
@@ -27,6 +27,15 @@
     "testTimeout": 30000
   },
   "license": "MIT",
+  "author": "Andrew Kuklewicz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PRX/eas-detect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PRX/eas-detect/issues"
+  },
+  "homepage": "https://github.com/PRX/eas-detect#readme",
   "devDependencies": {
     "jest": "^30.3.0"
   }
