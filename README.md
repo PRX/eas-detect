@@ -32,7 +32,21 @@ For raw PCM input (signed 16-bit little-endian) you also need to specify the sam
 npx eas-detect recording.bin --raw --sample-rate 22050
 ```
 
+For audio where EAS tones are mixed with speech or music (e.g. TV broadcasts),
+use the sensitive FSK detection mode:
+
+```bash
+npx eas-detect recording.mp3 --fsk-mode sensitive
+```
+
 Output is JSON to stdout.
+
+### FSK Detection Modes
+
+| Mode | Flag | Description |
+|------|------|-------------|
+| default | *(none)* | Energy-ratio analysis with alternation validation. Fast and precise, best for clean recordings. |
+| sensitive | `--fsk-mode sensitive` | Bandpass filtering + mark/space anti-correlation analysis. Detects faint FSK buried under speech or music, but may produce more false positives on music-heavy content. |
 
 ## Library Usage
 
@@ -40,6 +54,8 @@ Output is JSON to stdout.
 import { detect } from "@prx.org/eas-detect";
 
 const result = await detect("recording.wav");
+// Or with sensitive FSK detection:
+// const result = await detect("recording.wav", { fskMode: "sensitive" });
 
 if (result.easDetected) {
   console.log(`Match: ${result.matchType}`); // "full", "partial", or "none"
@@ -157,11 +173,11 @@ When only some EAS components are present — for example, just the End of Messa
 
 ## How It Works
 
-Three detection methods run in parallel on the audio:
+Three detection methods run on the audio:
 
-1. **Attention tone detection** — [Goertzel algorithm](https://en.wikipedia.org/wiki/Goertzel_algorithm) tuned to 853 Hz and 960 Hz (the EAS dual-tone attention signal)
-2. **FSK energy detection** — Goertzel at the SAME mark (2083.3 Hz) and space (1562.5 Hz) frequencies, reporting presence even when the signal is too degraded to decode
-3. **SAME header decoding** — pipes audio through [SoX](https://sox.sourceforge.net/) into [multimon-ng](https://github.com/EliasOenal/multimon-ng) for full SAME protocol decoding with error correction
+1. **Attention tone detection** — [Goertzel algorithm](https://en.wikipedia.org/wiki/Goertzel_algorithm) tuned to 853 Hz and 960 Hz (the EAS dual-tone attention signal), using energy-ratio analysis. Also runs on bandpass-filtered audio (800-1000 Hz) to catch tones buried under speech or music.
+2. **FSK detection** — Detects the FSK modulation pattern (mark at 2083.3 Hz, space at 1562.5 Hz). The default mode uses Goertzel energy ratios with mark/space alternation validation. The sensitive mode applies narrow bandpass filters around each frequency and detects anti-correlation between the mark and space energy envelopes using Pearson correlation.
+3. **SAME header decoding** — Pipes audio through [SoX](https://sox.sourceforge.net/) into [multimon-ng](https://github.com/EliasOenal/multimon-ng) for full SAME protocol decoding with error correction.
 
 Decoded SAME headers are parsed and enriched with human-readable lookups from 3,235 FIPS county codes and all standard EAS originator/event codes.
 
