@@ -5,9 +5,10 @@
  */
 
 import { detectAttentionTone } from "./attention-tone-detect.js";
-import { bandpassFilter, readAudio, SAMPLE_RATE } from "./audio.js";
+import { bandpassFilter, readAudio,  SAMPLE_RATE } from "./audio.js";
 import { parseSameHeader } from "./eas-parser.js";
 import { detectFsk } from "./fsk-detect.js";
+import { detectFskSensitive } from "./fsk-detect-sensitive.js";
 import { decodeSame } from "./same-decode.js";
 import { unlinkSync } from "node:fs";
 
@@ -21,9 +22,13 @@ const MERGE_GAP = 0.1;
  * @param {object} [options]
  * @param {boolean} [options.raw=false] - Input is raw s16le PCM
  * @param {number} [options.sampleRate=22050] - Sample rate for raw input
+ * @param {string} [options.fskMode="default"] - FSK detection mode:
+ *   "default" uses energy-ratio analysis with alternation validation,
+ *   "sensitive" uses bandpass filtering and mark/space anti-correlation
+ *   detection (better for weak signals mixed with speech, more false positives)
  * @returns {object} Detection results as JSON-serializable object
  */
-export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE } = {}) {
+export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE, fskMode = "default" } = {}) {
   // Read audio into PCM samples and a raw file for multimon-ng
   const { samples, sampleRate: sr, rawPath } = readAudio(filePath, { raw, sampleRate });
   const durationSeconds = Math.round((samples.length / sr) * 1000) / 1000;
@@ -33,7 +38,9 @@ export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE }
   // tones buried under speech or music. FSK detection is not bandpass-filtered
   // because dialogue harmonics in the 1500-2150 Hz range cause false positives.
   const toneIntervals = detectAttentionTone(samples, sr);
-  const fskIntervals = detectFsk(samples, sr);
+  const fskIntervals = fskMode === "sensitive"
+    ? detectFskSensitive(rawPath, sr)
+    : detectFsk(samples, sr);
 
   // Bandpass-filtered attention tone detection for weak/mixed signals
   const filteredAttnSamples = bandpassFilter(rawPath, 800, 1000, sr);
