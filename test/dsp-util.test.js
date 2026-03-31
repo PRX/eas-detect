@@ -1,4 +1,9 @@
-import { windowEnergy, round3, ENERGY_RATIO_THRESHOLD, SILENCE_THRESHOLD } from "../src/dsp-util.js";
+import {
+  ENERGY_RATIO_THRESHOLD,
+  round3,
+  SILENCE_THRESHOLD,
+  windowEnergy,
+} from "../src/dsp-util.js";
 
 describe("windowEnergy", () => {
   test("returns zero for silence", () => {

@@ -1,6 +1,6 @@
-import { detect } from "../src/detect.js";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { detect } from "../src/detect.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => join(__dirname, "fixtures", name);

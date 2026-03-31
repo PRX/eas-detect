@@ -15,7 +15,7 @@
 
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join  } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -152,13 +152,7 @@ function sameHeader(headerStr) {
 
 /** Encode EOM (NNNN, 3 bursts) */
 function sameEom() {
-  return concat([
-    fskString("NNNN"),
-    silence(1),
-    fskString("NNNN"),
-    silence(1),
-    fskString("NNNN"),
-  ]);
+  return concat([fskString("NNNN"), silence(1), fskString("NNNN"), silence(1), fskString("NNNN")]);
 }
 
 function concat(arrays) {
@@ -205,10 +199,7 @@ writeWav(
 );
 
 // 4. EOM only (NNNN)
-writeWav(
-  join(FIXTURES_DIR, "eom-only.wav"),
-  concat([silence(0.5), sameEom(), silence(0.5)]),
-);
+writeWav(join(FIXTURES_DIR, "eom-only.wav"), concat([silence(0.5), sameEom(), silence(0.5)]));
 
 // 5. Silence
 writeWav(join(FIXTURES_DIR, "silence.wav"), silence(5));
@@ -222,13 +213,7 @@ writeWav(
 // 7. Attention tone + EOM (no header)
 writeWav(
   join(FIXTURES_DIR, "attn-and-eom.wav"),
-  concat([
-    silence(0.5),
-    attentionTone(8),
-    silence(1),
-    sameEom(),
-    silence(0.5),
-  ]),
+  concat([silence(0.5), attentionTone(8), silence(1), sameEom(), silence(0.5)]),
 );
 
 // 8. 960 Hz tone only (no 853 Hz)
@@ -247,8 +232,7 @@ writeWav(
 
 console.log("\nDownloading sameold sample files...");
 
-const SAMEOLD_BASE =
-  "https://raw.githubusercontent.com/cbs228/sameold/develop/sample";
+const SAMEOLD_BASE = "https://raw.githubusercontent.com/cbs228/sameold/develop/sample";
 const SAMEOLD_FILES = [
   "npt.22050.s16le.bin",
   "long_message.22050.s16le.bin",

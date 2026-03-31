@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, unlinkSync, mkdtempSync } from "node:fs";
-import { join } from "node:path";
+import { mkdtempSync, readFileSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const SAMPLE_RATE = 22050;
 
@@ -31,11 +31,16 @@ export function readAudio(filePath, { raw = false, sampleRate = SAMPLE_RATE } = 
 
     execFileSync("sox", [
       filePath,
-      "-t", "raw",
-      "-e", "signed-integer",
-      "-b", "16",
-      "-r", String(sampleRate),
-      "-c", "1",
+      "-t",
+      "raw",
+      "-e",
+      "signed-integer",
+      "-b",
+      "16",
+      "-r",
+      String(sampleRate),
+      "-c",
+      "1",
       rawPath,
     ]);
     buf = readFileSync(rawPath);
@@ -68,11 +73,30 @@ export function bandpassFilter(rawPath, lowFreq, highFreq, sampleRate = SAMPLE_R
 
   try {
     execFileSync("sox", [
-      "-t", "raw", "-e", "signed-integer", "-b", "16", "-r", String(sampleRate), "-c", "1",
+      "-t",
+      "raw",
+      "-e",
+      "signed-integer",
+      "-b",
+      "16",
+      "-r",
+      String(sampleRate),
+      "-c",
+      "1",
       rawPath,
-      "-t", "raw", "-e", "signed-integer", "-b", "16", "-r", String(sampleRate), "-c", "1",
+      "-t",
+      "raw",
+      "-e",
+      "signed-integer",
+      "-b",
+      "16",
+      "-r",
+      String(sampleRate),
+      "-c",
+      "1",
       filteredPath,
-      "sinc", `${lowFreq}-${highFreq}`,
+      "sinc",
+      `${lowFreq}-${highFreq}`,
     ]);
 
     const buf = readFileSync(filteredPath);
@@ -83,7 +107,9 @@ export function bandpassFilter(rawPath, lowFreq, highFreq, sampleRate = SAMPLE_R
     }
     return samples;
   } finally {
-    try { unlinkSync(filteredPath); } catch {}
+    try {
+      unlinkSync(filteredPath);
+    } catch {}
   }
 }
 

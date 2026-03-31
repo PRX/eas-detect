@@ -1,9 +1,6 @@
-import { readAudio, SAMPLE_RATE } from "../src/audio.js";
-import { writeFileSync, unlinkSync, mkdtempSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readAudio, SAMPLE_RATE } from "../src/audio.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => join(__dirname, "fixtures", name);
@@ -26,10 +23,10 @@ describe("readAudio", () => {
   });
 
   test("reads raw s16le PCM with explicit sample rate", () => {
-    const { samples, sampleRate, rawPath } = readAudio(
-      fixture("npt.22050.s16le.bin"),
-      { raw: true, sampleRate: 22050 },
-    );
+    const { samples, sampleRate, rawPath } = readAudio(fixture("npt.22050.s16le.bin"), {
+      raw: true,
+      sampleRate: 22050,
+    });
     expect(sampleRate).toBe(22050);
     expect(samples).toBeInstanceOf(Float64Array);
     expect(samples.length).toBeGreaterThan(0);

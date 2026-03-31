@@ -87,7 +87,7 @@ export function detectFsk(samples, sampleRate) {
   const isFskCandidate = new Array(windows.length).fill(false);
 
   for (let i = 0; i < windows.length; i++) {
-    const type  = windows[i].type;
+    const type = windows[i].type;
     if (type === "neither" || type === "silent") continue;
 
     if (type === "both") {

@@ -4,13 +4,13 @@
  * Runs all detectors on an audio file and returns a unified result.
  */
 
+import { unlinkSync } from "node:fs";
 import { detectAttentionTone } from "./attention-tone-detect.js";
-import { bandpassFilter, readAudio,  SAMPLE_RATE } from "./audio.js";
+import { bandpassFilter, readAudio, SAMPLE_RATE } from "./audio.js";
 import { parseSameHeader } from "./eas-parser.js";
 import { detectFsk } from "./fsk-detect.js";
 import { detectFskSensitive } from "./fsk-detect-sensitive.js";
 import { decodeSame } from "./same-decode.js";
-import { unlinkSync } from "node:fs";
 
 // Intervals within this gap (seconds) are merged into one
 const MERGE_GAP = 0.1;
@@ -28,7 +28,10 @@ const MERGE_GAP = 0.1;
  *   detection (better for weak signals mixed with speech, more false positives)
  * @returns {object} Detection results as JSON-serializable object
  */
-export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE, fskMode = "default" } = {}) {
+export async function detect(
+  filePath,
+  { raw = false, sampleRate = SAMPLE_RATE, fskMode = "default" } = {},
+) {
   // Read audio into PCM samples and a raw file for multimon-ng
   const { samples, sampleRate: sr, rawPath } = readAudio(filePath, { raw, sampleRate });
   const durationSeconds = Math.round((samples.length / sr) * 1000) / 1000;
@@ -38,9 +41,8 @@ export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE, 
   // tones buried under speech or music. FSK detection is not bandpass-filtered
   // because dialogue harmonics in the 1500-2150 Hz range cause false positives.
   const toneIntervals = detectAttentionTone(samples, sr);
-  const fskIntervals = fskMode === "sensitive"
-    ? detectFskSensitive(rawPath, sr)
-    : detectFsk(samples, sr);
+  const fskIntervals =
+    fskMode === "sensitive" ? detectFskSensitive(rawPath, sr) : detectFsk(samples, sr);
 
   // Bandpass-filtered attention tone detection for weak/mixed signals
   const filteredAttnSamples = bandpassFilter(rawPath, 800, 1000, sr);
@@ -49,7 +51,9 @@ export async function detect(filePath, { raw = false, sampleRate = SAMPLE_RATE, 
 
   // Clean up temp raw file (only if readAudio created one)
   if (rawPath !== filePath) {
-    try { unlinkSync(rawPath); } catch {}
+    try {
+      unlinkSync(rawPath);
+    } catch {}
   }
 
   // Parse any decoded SAME headers
@@ -145,6 +149,8 @@ export async function detectBuffer(buffer, extension = ".wav") {
   try {
     return detect(tmpFile);
   } finally {
-    try { unlinkSync(tmpFile); } catch {}
+    try {
+      unlinkSync(tmpFile);
+    } catch {}
   }
 }

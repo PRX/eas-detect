@@ -58,7 +58,6 @@ const MAX_GAP = 0.3;
 // Minimum number of active analysis regions in a candidate interval
 const MIN_ACTIVE_REGIONS = 2;
 
-
 /**
  * Detect FSK modulation using bandpass-filtered correlation analysis.
  *
@@ -110,7 +109,8 @@ export function detectFskSensitive(rawPath, sampleRate) {
     const time = i / envRate;
 
     // Check both bands have some energy
-    let markSum = 0, spaceSum = 0;
+    let markSum = 0,
+      spaceSum = 0;
     for (let j = 0; j < regionSize; j++) {
       markSum += markRegion[j];
       spaceSum += spaceRegion[j];
@@ -122,8 +122,10 @@ export function detectFskSensitive(rawPath, sampleRate) {
     }
 
     const corr = pearsonCorrelation(
-      markRegion, spaceRegion,
-      markSum / regionSize, spaceSum / regionSize,
+      markRegion,
+      spaceRegion,
+      markSum / regionSize,
+      spaceSum / regionSize,
     );
 
     regions.push({ time, active: corr < CORRELATION_THRESHOLD });
@@ -147,7 +149,11 @@ export function detectFskSensitive(rawPath, sampleRate) {
       activeCount++;
     } else if (inInterval && region.time - lastActiveTime > MAX_GAP) {
       const duration = lastActiveTime - intervalStart;
-      if (duration >= MIN_DURATION && duration <= MAX_INTERVAL_DURATION && activeCount >= MIN_ACTIVE_REGIONS) {
+      if (
+        duration >= MIN_DURATION &&
+        duration <= MAX_INTERVAL_DURATION &&
+        activeCount >= MIN_ACTIVE_REGIONS
+      ) {
         candidates.push({ start: intervalStart, end: lastActiveTime });
       }
       inInterval = false;
@@ -156,7 +162,11 @@ export function detectFskSensitive(rawPath, sampleRate) {
 
   if (inInterval) {
     const duration = lastActiveTime - intervalStart;
-    if (duration >= MIN_DURATION && duration <= MAX_INTERVAL_DURATION && activeCount >= MIN_ACTIVE_REGIONS) {
+    if (
+      duration >= MIN_DURATION &&
+      duration <= MAX_INTERVAL_DURATION &&
+      activeCount >= MIN_ACTIVE_REGIONS
+    ) {
       candidates.push({ start: intervalStart, end: lastActiveTime });
     }
   }
@@ -207,7 +217,9 @@ function hasAlternation(markEnvelope, spaceEnvelope, startIdx, endIdx) {
  */
 function pearsonCorrelation(a, b, meanA, meanB) {
   const n = a.length;
-  let sumAB = 0, sumAA = 0, sumBB = 0;
+  let sumAB = 0,
+    sumAA = 0,
+    sumBB = 0;
 
   for (let i = 0; i < n; i++) {
     const da = a[i] - meanA;

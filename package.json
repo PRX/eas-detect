@@ -12,7 +12,10 @@
   },
   "scripts": {
     "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest",
-    "generate-fixtures": "node test/generate-fixtures.js"
+    "generate-fixtures": "node test/generate-fixtures.js",
+    "lint": "biome check",
+    "lint-ci": "biome ci",
+    "lint-fix": "biome check --write --unsafe"
   },
   "keywords": [
     "eas",
@@ -37,6 +40,7 @@
   },
   "homepage": "https://github.com/PRX/eas-detect#readme",
   "devDependencies": {
-    "jest": "^30.3.0"
+    "jest": "^30.3.0",
+    "@biomejs/biome": "2.2.4"
   }
 }

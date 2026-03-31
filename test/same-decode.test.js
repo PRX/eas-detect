@@ -1,7 +1,7 @@
-import { decodeSame } from "../src/same-decode.js";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAudio } from "../src/audio.js";
+import { decodeSame } from "../src/same-decode.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => join(__dirname, "fixtures", name);

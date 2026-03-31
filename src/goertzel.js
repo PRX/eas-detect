@@ -53,8 +53,7 @@ export function goertzel(samples, sampleRate, targetFreq) {
   // Compute magnitude squared from the final filter state:
   //   |X(k)|^2 = s1^2 + s2^2 - coeff * s1 * s2
   // Normalized by N^2 for consistent scaling across window sizes.
-  const magnitudeSquared =
-    prev1 * prev1 + prev2 * prev2 - filterCoeff * prev1 * prev2;
+  const magnitudeSquared = prev1 * prev1 + prev2 * prev2 - filterCoeff * prev1 * prev2;
 
   return magnitudeSquared / (numSamples * numSamples);
 }

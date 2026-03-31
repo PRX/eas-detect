@@ -1,4 +1,4 @@
-import { ORIGINATOR_CODES, EVENT_CODES, STATE_FIPS } from "../src/eas-codes.js";
+import { EVENT_CODES, ORIGINATOR_CODES, STATE_FIPS } from "../src/eas-codes.js";
 import { COUNTY_FIPS } from "../src/fips-counties.js";
 
 describe("ORIGINATOR_CODES", () => {
@@ -10,7 +10,7 @@ describe("ORIGINATOR_CODES", () => {
   });
 
   test("all values are non-empty strings", () => {
-    for (const [code, name] of Object.entries(ORIGINATOR_CODES)) {
+    for (const [_code, name] of Object.entries(ORIGINATOR_CODES)) {
       expect(typeof name).toBe("string");
       expect(name.length).toBeGreaterThan(0);
     }
@@ -58,7 +58,7 @@ describe("EVENT_CODES", () => {
   });
 
   test("all values are non-empty strings", () => {
-    for (const [code, name] of Object.entries(EVENT_CODES)) {
+    for (const [_code, name] of Object.entries(EVENT_CODES)) {
       expect(typeof name).toBe("string");
       expect(name.length).toBeGreaterThan(0);
     }

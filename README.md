@@ -9,8 +9,8 @@ Supports full and **partial** match detection — even if only the attention ton
 ## Requirements
 
 - Node.js >= 18
-- [SoX](https://sox.sourceforge.net/) (`brew install sox`)
-- [multimon-ng](https://github.com/EliasOenal/multimon-ng) (`brew install multimon-ng`)
+- [SoX](https://sox.sourceforge.net/)
+- [multimon-ng](https://github.com/EliasOenal/multimon-ng)
 
 ## Install
 
@@ -201,16 +201,29 @@ The SAME header format is: `ZCZC-ORG-EEE-PSSCCC+TTTT-JJJHHMM-LLLLLLLL-`
 | `JJJHHMM` | Issue time (Julian day + UTC time) |
 | `LLLLLLLL` | Sender callsign |
 
-## Testing
+## Contributing
+
+This project uses yarn, so install that before testing.
 
 ```bash
 # Generate test audio fixtures
-npm run generate-fixtures
+yarn generate-fixtures
 
 # Run tests
-npm test
+yarn test
+
+# Run lint
+yarn lint
 ```
 
 ## License
 
 MIT
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create new Pull Request

@@ -17,9 +17,7 @@ export function parseSameHeader(raw) {
   const header = raw.trim();
 
   // Strip trailing dash if present
-  const cleaned = header.endsWith("-")
-    ? header.slice(0, -1)
-    : header;
+  const cleaned = header.endsWith("-") ? header.slice(0, -1) : header;
 
   // Split on the + to separate locations from duration+time+sender
   const plusIdx = cleaned.indexOf("+");
@@ -105,16 +103,16 @@ function parseLocation(code) {
   };
 
   const SUBDIVISIONS = {
-    "0": "Entire county",
-    "1": "Northwest",
-    "2": "North",
-    "3": "Northeast",
-    "4": "West",
-    "5": "Central",
-    "6": "East",
-    "7": "Southwest",
-    "8": "South",
-    "9": "Southeast",
+    0: "Entire county",
+    1: "Northwest",
+    2: "North",
+    3: "Northeast",
+    4: "West",
+    5: "Central",
+    6: "East",
+    7: "Southwest",
+    8: "South",
+    9: "Southeast",
   };
 
   if (subdivision !== "0") {
