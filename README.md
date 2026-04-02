@@ -9,8 +9,8 @@ Supports full and **partial** match detection — even if only the attention ton
 ## Requirements
 
 - Node.js >= 18
-- [SoX](https://sox.sourceforge.net/)
-- [multimon-ng](https://github.com/EliasOenal/multimon-ng)
+- [FFmpeg](https://ffmpeg.org/) (`brew install ffmpeg`)
+- [multimon-ng](https://github.com/EliasOenal/multimon-ng) (build from source or `apt install multimon-ng`)
 
 ## Install
 
@@ -20,7 +20,7 @@ npm install @prx.org/eas-detect
 
 ## CLI Usage
 
-Call on any audio file, it will use sox to analyze the file:
+Call on any audio file, it will use ffmpeg to analyze the file:
 
 ```bash
 npx eas-detect recording.wav
@@ -177,7 +177,7 @@ Three detection methods run on the audio:
 
 1. **Attention tone detection** — [Goertzel algorithm](https://en.wikipedia.org/wiki/Goertzel_algorithm) tuned to 853 Hz and 960 Hz (the EAS dual-tone attention signal), using energy-ratio analysis. Also runs on bandpass-filtered audio (800-1000 Hz) to catch tones buried under speech or music.
 2. **FSK detection** — Detects the FSK modulation pattern (mark at 2083.3 Hz, space at 1562.5 Hz). The default mode uses Goertzel energy ratios with mark/space alternation validation. The sensitive mode applies narrow bandpass filters around each frequency and detects anti-correlation between the mark and space energy envelopes using Pearson correlation.
-3. **SAME header decoding** — Pipes audio through [SoX](https://sox.sourceforge.net/) into [multimon-ng](https://github.com/EliasOenal/multimon-ng) for full SAME protocol decoding with error correction.
+3. **SAME header decoding** — Converts audio via [FFmpeg](https://ffmpeg.org/) and pipes into [multimon-ng](https://github.com/EliasOenal/multimon-ng) for full SAME protocol decoding with error correction.
 
 Decoded SAME headers are parsed and enriched with human-readable lookups from 3,235 FIPS county codes and all standard EAS originator/event codes.
 
