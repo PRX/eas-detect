@@ -85,7 +85,7 @@ export function bandpassFilter(rawPath, lowFreq, highFreq, sampleRate = SAMPLE_R
       "-i",
       rawPath,
       "-filter_complex",
-      `sinc=hp=${lowFreq}:lp=${highFreq}:r=${sampleRate}[ir];[0:a][ir]afir=irnorm=-1`,
+      `sinc=hp=${lowFreq}:lp=${highFreq}:r=${sampleRate}[ir];[0:a][ir]afir`,
       "-f",
       "s16le",
       "-acodec",
