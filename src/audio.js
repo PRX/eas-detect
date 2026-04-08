@@ -7,9 +7,9 @@ const SAMPLE_RATE = 22050;
 
 /**
  * Read an audio file and return mono PCM samples as a Float64Array at 22050 Hz.
- * Uses sox for format conversion. Also accepts raw s16le PCM if `raw` option is set.
+ * Uses ffmpeg for format conversion. Also accepts raw s16le PCM if `raw` option is set.
  *
- * For non-raw input, sox writes to a temp raw file allowing files of any length
+ * For non-raw input, ffmpeg writes to a temp raw file allowing files of any length
  * to be processed. The temp file path is returned as `rawPath` so downstream
  * consumers (e.g., multimon-ng) can reuse it without re-converting.
  *
@@ -29,20 +29,20 @@ export function readAudio(filePath, { raw = false, sampleRate = SAMPLE_RATE } = 
     const dir = mkdtempSync(join(tmpdir(), "eas-"));
     rawPath = join(dir, "audio.raw");
 
-    execFileSync("sox", [
+    execFileSync("ffmpeg", [
+      "-i",
       filePath,
-      "-t",
-      "raw",
-      "-e",
-      "signed-integer",
-      "-b",
-      "16",
-      "-r",
+      "-f",
+      "s16le",
+      "-acodec",
+      "pcm_s16le",
+      "-ar",
       String(sampleRate),
-      "-c",
+      "-ac",
       "1",
+      "-y",
       rawPath,
-    ]);
+    ], { stdio: ["pipe", "pipe", "pipe"] });
     buf = readFileSync(rawPath);
   }
 
@@ -57,9 +57,9 @@ export function readAudio(filePath, { raw = false, sampleRate = SAMPLE_RATE } = 
 }
 
 /**
- * Apply a sox bandpass filter to a raw PCM file and return filtered samples.
- * Used to isolate EAS frequency bands before energy-ratio analysis, improving
- * detection of tones buried under speech or music.
+ * Apply a bandpass filter to a raw PCM file and return filtered samples.
+ * Uses ffmpeg's sinc FIR filter generator with afir convolution to produce
+ * a sharp bandpass response equivalent to sox's sinc filter.
  *
  * @param {string} rawPath - Path to s16le 22050 Hz mono raw PCM file
  * @param {number} lowFreq - Lower edge of the bandpass filter in Hz
@@ -71,33 +71,28 @@ export function bandpassFilter(rawPath, lowFreq, highFreq, sampleRate = SAMPLE_R
   const dir = mkdtempSync(join(tmpdir(), "eas-bp-"));
   const filteredPath = join(dir, "filtered.raw");
 
+  // Generate a FIR bandpass kernel with ffmpeg's sinc filter (hp + lp cutoffs),
+  // then apply it to the audio with afir. This matches sox's sinc filter quality:
+  // steep rolloff, flat passband, linear phase.
   try {
-    execFileSync("sox", [
-      "-t",
-      "raw",
-      "-e",
-      "signed-integer",
-      "-b",
-      "16",
-      "-r",
+    execFileSync("ffmpeg", [
+      "-f",
+      "s16le",
+      "-ar",
       String(sampleRate),
-      "-c",
+      "-ac",
       "1",
+      "-i",
       rawPath,
-      "-t",
-      "raw",
-      "-e",
-      "signed-integer",
-      "-b",
-      "16",
-      "-r",
-      String(sampleRate),
-      "-c",
-      "1",
+      "-filter_complex",
+      `sinc=hp=${lowFreq}:lp=${highFreq}:r=${sampleRate}[ir];[0:a][ir]afir`,
+      "-f",
+      "s16le",
+      "-acodec",
+      "pcm_s16le",
+      "-y",
       filteredPath,
-      "sinc",
-      `${lowFreq}-${highFreq}`,
-    ]);
+    ], { stdio: ["pipe", "pipe", "pipe"] });
 
     const buf = readFileSync(filteredPath);
     const sampleCount = buf.length / 2;

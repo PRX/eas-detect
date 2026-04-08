@@ -7,7 +7,7 @@
  * alternate at the baud rate. Music harmonics tend to rise and fall together
  * (positive correlation).
  *
- * Uses narrow bandpass filters (±50 Hz) via sox to isolate each FSK frequency,
+ * Uses narrow bandpass filters (±50 Hz) via ffmpeg to isolate each FSK frequency,
  * then computes energy envelopes and Pearson correlation over sliding regions.
  * The bandpass improves sensitivity by removing competing frequencies that
  * would dilute the correlation signal.
